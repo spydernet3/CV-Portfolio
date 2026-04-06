@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent: #00d4ff;
+            --error: #ff4b2b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #1a1c2c, #0d0e14);
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .page-wrapper {
+            width: 100%; height: 100%;
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        section {
+            min-width: 100vw; height: 100vh;
+            padding: 40px 5%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 30px;
+        }
+
+        /* FIXED GRID: 3 IN A ROW */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 30px;
+        }
+        
+        .nav-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 20px 10px;
+            border-radius: 15px;
+            cursor: pointer; 
+            transition: 0.3s;
+            text-transform: uppercase; 
+            font-weight: 600; 
+            font-size: 0.75rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-card:hover { 
+            border-color: var(--accent); 
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* MOBILE VIEW */
+        @media (max-width: 768px) {
+            .nav-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .nav-grid { grid-template-columns: 1fr; }
+        }
+
+        /* PASSCODE OVERLAY */
+        #pass-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+
+        .pass-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--accent);
+            padding: 12px; border-radius: 10px;
+            color: #fff; text-align: center; font-size: 1.2rem;
+            width: 100%; max-width: 200px; margin-bottom: 20px; outline: none;
+        }
+
+        .content-container { width: 100%; max-width: 1000px; height: 80vh; overflow-y: auto; }
+        .back-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 10px 25px; border-radius: 30px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
+        h2 { color: var(--accent); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="pass-overlay">
+        <div class="glass-panel" style="text-align: center; width: 300px;">
+            <h3>Security Gate</h3>
+            <p style="margin: 10px 0 20px; opacity: 0.6; font-size: 0.8rem;">Enter code to unlock private view</p>
+            <input type="password" id="uPass" class="pass-input" placeholder="••••">
+            <button class="nav-card" style="width: 100%;" onclick="requestContent()">Confirm</button>
+            <p id="err" style="color: var(--error); margin-top: 15px; display: none; font-size: 0.8rem;">Access Denied</p>
+            <button onclick="closePass()" style="background:none; border:none; color:#777; margin-top:20px; cursor:pointer; font-size: 0.7rem;">CANCEL</button>
+        </div>
+    </div>
+
+    <div class="page-wrapper" id="mainWrapper">
+        <section id="home">
+            <img src="YOUR_DRIVE_PUBLIC_SHARE_LINK" style="width:120px; height:120px; border-radius:30%; object-fit: cover; border: 2px solid var(--glass-border);">
+            <h1 style="margin-top:20px; letter-spacing: 2px;">PROFESSIONAL PORTFOLIO</h1>
+            <div style="max-width: 700px; margin: 25px 0; text-align: center; opacity: 0.7; font-size: 0.9rem; line-height: 1.6;">
+               technical skill enhancement.
+            </div>
+
+            <div class="nav-grid">
+                <div class="nav-card" onclick="askPass('exp')">Experience</div>
+                <div class="nav-card" onclick="askPass('edu')">Education</div>
+                <div class="nav-card" onclick="askPass('cert')">Certification</div>
+                
+                <div class="nav-card" onclick="loadPublic('skill')">Skills</div>
+                <div class="nav-card" onclick="loadPublic('key')">Key Strengths</div>
+                <div class="nav-card" onclick="loadPublic('fash')">Fashion</div>
+                <div class="nav-card" onclick="loadPublic('indi')">Projects</div>
+                <div class="nav-card" onclick="loadPublic('lan')">Languages</div>
+            </div>
+        </section>
+
+        <section style="align-items: center; background: rgba(0,0,0,0.4);">
+            <div style="width: 100%; max-width: 1000px;">
+                <button class="back-btn" onclick="goHome()">← BACK</button>
+                <div class="glass-panel content-container" id="pageBody"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let selectedKey = "";
+
+        // Reset on load
+        window.onload = () => { sessionStorage.removeItem('activePass'); };
+
+        // Unified Public Loading Function
+        function loadPublic(type) {
+            const contentMap = {
+                'skill': "<h2>Technical Skills</h2><p>Expertise in GAS, Python, and AI automation...</p>",
+                'indi': "<h2>Independent Projects</h2><p>Details about your Google Apps Script builds...</p>",
+                'key': "<h2>Key Strengths</h2><p>Problem-solving, Motherboard repair, Automation...</p>",
+                'lan': "<h2>Languages</h2><p>English, Tamil...</p>",
+                'fash': "<h2>Fashion</h2><p>Portfolio highlights in fashion...</p>"
+            };
+            document.getElementById('pageBody').innerHTML = contentMap[type] || "<h2>Content</h2><p>Coming soon...</p>";
+            document.getElementById('mainWrapper').style.transform = "translateX(-100vw)";
+        }
+
+        function askPass(key) {
+            selectedKey = key;
+            document.getElementById('pass-overlay').style.display = 'flex';
+            document.getElementById('uPass').focus();
+        }
+
+        function requestContent() {
+            const pass = document.getElementById('uPass').value;
+            if(!pass) return;
+
+            // Integrates with your server-side .gs script
+            google.script.run.withSuccessHandler(function(response) {
+                if (response.success) {
+                    document.getElementById('pass-overlay').style.display = 'none';
+                    document.getElementById('uPass').value = "";
+                    document.getElementById('err').style.display = 'none';
+                    document.getElementById('pageBody').innerHTML = response.html;
+                    document.getElementById('mainWrapper').style.transform = "translateX(-100vw)";
+                } else {
+                    document.getElementById('err').style.display = 'block';
+                }
+            }).verifyAndGetContent(pass, selectedKey);
+        }
+
+        function closePass() { document.getElementById('pass-overlay').style.display = 'none'; }
+        function goHome() { document.getElementById('mainWrapper').style.transform = "translateX(0)"; }
+    </script>
+</body>
+</html>
